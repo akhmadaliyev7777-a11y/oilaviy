@@ -202,9 +202,12 @@ h2{font-size:clamp(28px,7.5vw,36px)}
 .reply{font-family:var(--f-display);font-size:clamp(21px,5.6vw,24px);line-height:1.45;text-align:center;color:var(--gold-2);margin:0;max-width:26ch}
 .sign{font-family:var(--f-display);font-style:italic;font-size:19px;color:var(--cream);margin:0}
 
-.answers{position:relative;width:100%;height:190px;display:flex;flex-direction:column;align-items:center;gap:12px}
-.answers #yes{transition:transform .25s}
-.answers #no.run{position:absolute;width:auto;max-width:none;transition:left .25s ease, top .25s ease}
+.answers{position:relative;width:100%;height:170px;display:flex;align-items:center;justify-content:center;gap:30px}
+.answers .btn{width:auto;max-width:none;padding:0;border-radius:50%;display:grid;place-items:center}
+.answers #yes{width:136px;height:136px;font-size:30px;animation:yesbeat 2.4s ease-in-out infinite}
+@keyframes yesbeat{0%,100%{transform:scale(var(--g,1))}50%{transform:scale(calc(var(--g,1) * 1.06))}}
+.answers #no{width:62px;height:62px;font-size:15px;z-index:5;background:rgba(22,33,62,.95)}
+.answers #no.run{position:fixed;transition:left .35s cubic-bezier(.3,1.4,.5,1), top .35s cubic-bezier(.3,1.4,.5,1)}
 .nohint{font-family:var(--f-display);font-style:italic;font-size:17px;color:var(--gold-2);margin:-8px 0 0;min-height:1.4em;text-align:center}
 
 /* ---------- 6. Heart ---------- */
@@ -378,10 +381,10 @@ h2{font-size:clamp(28px,7.5vw,36px)}
 <section class="screen dark" id="s5">
   <img class="corner tl" src="rasmlar/tl.webp" alt=""><img class="corner tr" src="rasmlar/tr.webp" alt="">
   <div class="inner">
-    <h2 style="margin-top:28px">Sovg’amni qabul qilasizmi?</h2>
+    <h2 style="margin-top:28px">Sovg’amni qabul qiling. Meni kechirdingizmi?</h2>
     <div class="answers" id="answers">
-      <button class="btn" id="yes">Qabul qilaman</button>
-      <button class="btn ghost" id="no">Qabul qilmayman</button>
+      <button class="btn" id="yes">Ha</button>
+      <button class="btn ghost" id="no">Yo’q</button>
     </div>
     <p class="nohint" id="nohint" aria-live="polite"></p>
     <div class="scene"><img src="rasmlar/tea.webp" alt="Choynak va ikki piyola"><span class="lamp"></span></div>
@@ -631,17 +634,26 @@ h2{font-size:clamp(28px,7.5vw,36px)}
   $('to5').addEventListener('click', () => go('s5'));
 
   /* ---------- 5 ---------- */
-  const noTexts = ["Bu tugma charchagan…", "Yana bir o’ylab ko’ring 🙂", "Ushlay olmaysiz-da", "Sovg’a ham kutyapti", "Faqat “Qabul qilaman” qoldi"];
+  const noTexts = ["Bu tugma charchagan…", "Yana bir o’ylab ko’ring 🙂", "Ushlay olmaysiz-da", "Sovg’a ham kutyapti", "Faqat “Ha” qoldi"];
   let tries = 0;
   function dodge(ev){
     if (ev) ev.preventDefault();
-    const box = $('answers'), no = $('no');
-    const bw = box.clientWidth, bh = box.clientHeight;
+    // run far away anywhere on the screen, never onto the "Ha" circle
+    const no = $('no'), r = no.getBoundingClientRect(), y = $('yes').getBoundingClientRect();
+    const m = 14, size = r.width, W = innerWidth - size - m, H = innerHeight - size - m;
+    let x = r.left, t = r.top;
+    for (let k = 0; k < 40; k++) {
+      const nx = m + Math.random() * (W - m), ny = m + Math.random() * (H - m);
+      const far = Math.hypot(nx - r.left, ny - r.top) > Math.min(innerWidth, innerHeight) * .45;
+      const offYes = nx + size < y.left - 10 || nx > y.right + 10 || ny + size < y.top - 10 || ny > y.bottom + 10;
+      x = nx; t = ny;
+      if (far && offYes) break;
+    }
     no.classList.add('run');
-    no.style.left = Math.random() * Math.max(0, bw - no.offsetWidth) + 'px';
-    no.style.top = (64 + Math.random() * Math.max(0, bh - 64 - no.offsetHeight)) + 'px';
+    if (!no.style.left) { no.style.left = r.left + 'px'; no.style.top = r.top + 'px'; void no.offsetWidth; }
+    no.style.left = x + 'px'; no.style.top = t + 'px';
     $('nohint').textContent = noTexts[Math.min(tries++, noTexts.length - 1)];
-    $('yes').style.transform = `scale(${Math.min(1 + tries * .06, 1.25)})`;
+    $('yes').style.setProperty('--g', Math.min(1 + tries * .04, 1.16));
   }
   $('no').addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') dodge(e); });
   $('no').addEventListener('pointerdown', dodge);
