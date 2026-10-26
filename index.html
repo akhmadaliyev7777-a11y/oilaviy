@@ -83,7 +83,10 @@ h2{font-size:clamp(28px,7.5vw,36px)}
 
 /* ---------- 1. Opening: medallion that splits open ---------- */
 #s1 .name{font-family:var(--f-display);font-style:italic;font-weight:500;font-size:clamp(52px,15vw,72px);color:var(--gold-2);margin:6px 0 0;line-height:1}
-#s1 .lead{font-family:var(--f-display);font-size:clamp(19px,5vw,22px);text-align:center;margin:0;max-width:24ch;line-height:1.4}
+#s1 .lead,#s1b .lead{font-family:var(--f-display);font-size:clamp(19px,5vw,22px);text-align:center;margin:0;max-width:24ch;line-height:1.4;text-wrap:balance}
+.duo{display:flex;gap:12px;width:100%;max-width:330px;margin-top:4px}
+.duo .btn{flex:1;padding:16px 0}
+.love{font-family:var(--f-display);font-weight:600;font-size:clamp(27px,7.4vw,34px);line-height:1.3;color:var(--gold-2);text-align:center;margin:28px 0 0;max-width:15ch;text-wrap:balance}
 .medal{position:relative;width:min(300px,78vw);aspect-ratio:1;max-width:100%;border:0;padding:0;background:none;cursor:pointer;margin-top:6px}
 .medal .half{position:absolute;inset:0;background:url("rasmlar/medal.webp") center/cover no-repeat;border-radius:50%;
   -webkit-mask:radial-gradient(circle,#000 66%,transparent 71%);mask:radial-gradient(circle,#000 66%,transparent 71%);
@@ -258,11 +261,29 @@ h2{font-size:clamp(28px,7.5vw,36px)}
   <div class="inner">
     <p class="label">Faqat siz uchun</p>
     <p class="name">Irodam</p>
-    <p class="lead">Sizga aytmoqchi bo’lgan gaplarim bor. Naqshni oching.</p>
+    <p class="lead">Sizga aytadigan gaplarim bor edi.</p>
+    <div class="spacer"></div>
+    <p class="q">Siz mendan xafamisiz?</p>
+    <div class="duo">
+      <button class="btn ghost" data-go="s1b">Ha</button>
+      <button class="btn" data-go="s1b">Yo’q</button>
+    </div>
+    <div class="spacer"></div>
+  </div>
+</section>
+
+<!-- 1b -->
+<section class="screen dark" id="s1b">
+  <img class="corner tl" src="rasmlar/tl.webp" alt=""><img class="corner tr" src="rasmlar/tr.webp" alt="">
+  <img class="corner bl" src="rasmlar/bl.webp" alt=""><img class="corner br" src="rasmlar/br.webp" alt="">
+  <div class="inner">
+    <p class="love">Nima bo’lganda ham men sizni yaxshi ko’raman</p>
+    <p class="lead">Buni siz uchun qildim. Dildagi gaplarimni qabul qiling.</p>
     <button class="medal tap" id="medal" aria-label="Naqshni ochish">
       <span class="glow"></span><span class="light"></span>
       <span class="half l"></span><span class="half r"></span>
     </button>
+    <p class="hint" style="font-size:15px;color:var(--cream)">Naqshni oching</p>
     <div class="spacer"></div>
     <p class="hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a10 10 0 0 1 0 14"/></svg>Telefon ovozini yoqing</p>
   </div>
@@ -446,7 +467,10 @@ h2{font-size:clamp(28px,7.5vw,36px)}
   musicBtn.addEventListener('click', toggleSong);
   $('beat').addEventListener('click', toggleSong);
 
-  /* ---------- 1: open the medallion ---------- */
+  /* ---------- 1: "are you upset?" — either answer moves on ---------- */
+  document.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => go(b.dataset.go)));
+
+  /* ---------- 1b: open the medallion, music starts ---------- */
   $('medal').addEventListener('click', () => {
     playSong();
     $('medal').classList.add('open');
